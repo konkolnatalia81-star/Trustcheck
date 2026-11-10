@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10131d"><title>TRUST CHECK 2.0</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0e16;--panel:#151a28;--panel2:#1b2233;--line:#2a344b;--text:#f2f5ff;--muted:#9da9c2;--blue:#77a8ff;--green:#73d7ad;--red:#ff8f9b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1a2742 0,#0b0e16 55%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{width:min(760px,100%);margin:auto;padding:24px 16px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}.brand{font-weight:800;letter-spacing:.14em;font-size:13px;color:var(--blue)}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:5px 9px;border-radius:99px}
+h1{font-size:clamp(30px,7vw,48px);line-height:1.05;margin:0 0 14px;letter-spacing:-.04em}h2{font-size:22px;margin:0 0 10px}.lead{color:var(--muted);max-width:620px;margin:0 0 22px}.panel{background:linear-gradient(145deg,rgba(25,32,49,.97),rgba(17,22,34,.97));border:1px solid var(--line);border-radius:22px;padding:22px;margin:16px 0;box-shadow:0 18px 60px #0003}.notice{color:var(--muted);font-size:13px}.field{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:#0d1220;color:var(--text);font:inherit;outline:none}.field:focus{border-color:var(--blue)}.btn{border:0;border-radius:12px;padding:13px 18px;background:var(--blue);color:#08101f;font:700 15px system-ui;cursor:pointer}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.progress{height:7px;background:#242d40;border-radius:99px;overflow:hidden;margin:18px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#5e8fff,#81c6ff);transition:width .2s}.qmeta{color:var(--blue);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.question{font-size:22px;line-height:1.35;margin:12px 0 20px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{padding:14px;border:1px solid var(--line);border-radius:13px;background:#101625;color:var(--text);font:600 15px system-ui;cursor:pointer;text-align:left}.choice.selected{border-color:var(--blue);background:#1d3152}.choice.custom.selected{border-color:#d1adff;background:#2b2140}.hidden{display:none!important}.result{text-align:center;padding:25px 10px}.score{font-size:64px;font-weight:850;line-height:1.1;letter-spacing:-.06em;color:var(--green)}.small{font-size:13px;color:var(--muted)}.error{color:var(--red);margin-top:12px}.admin-item{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:#101625}.admin-item summary{cursor:pointer;font-weight:700}.answerline{font-size:13px;color:var(--muted);padding:5px 0;border-bottom:1px solid #252d40}.answerline b{color:var(--text)}.footer{margin-top:26px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:480px){.panel{padding:17px;border-radius:17px}.choices{grid-template-columns:1fr}.question{font-size:20px}.wrap{padding:18px 13px 40px}}
+</style></head><body><main class="wrap">
+<header class="top"><div class="brand">TRUST CHECK</div><div class="version">VERSION 2.0</div></header>
+<section id="home"><h1>Проверка доверия</h1>
+<p class="lead">24 жизненные ситуации, которые помогут оценить, насколько поступки человека вызывают доверие. Отвечай по реальному поведению, а не по обещаниям.</p>
+<div class="panel"><h2>Перед началом</h2>
+<p class="notice">Это не научный тест и не диагноз. Результат — ориентир для размышления, а не окончательный вывод о человеке. Не указывай фамилии, адреса, телефоны или другие личные данные. Ответы сохраняются на сервере, их может просматривать только администратор.</p>
+<label class="notice" for="nickname">Имя или псевдоним (необязательно)</label>
+<input id="nickname" class="field" maxlength="24" placeholder="Например, Участник 1" autocomplete="off">
+<div class="btnrow"><button class="btn" id="start">Начать проверку</button><button class="btn secondary" id="adminOpen">Вход администратора</button></div><div id="homeError" class="error"></div></div></section>
+<section id="quiz" class="hidden"><div class="qmeta" id="qmeta">ВОПРОС 1 ИЗ 24</div><div class="progress"><div class="bar" id="bar"></div></div>
+<div class="panel"><div class="question" id="question"></div>
+<div class="choices"><button class="choice" data-choice="yes">Да</button><button class="choice" data-choice="no">Нет</button><button class="choice custom" data-choice="custom" style="grid-column:1/-1">Свой вариант</button></div>
+<div id="customBox" class="hidden" style="margin-top:12px"><textarea id="customText" class="field" rows="3" maxlength="500" placeholder="Напиши свой вариант ответа..."></textarea></div>
+<div class="btnrow"><button class="btn secondary" id="back">Назад</button><button class="btn" id="next" disabled>Далее</button></div><div id="quizError" class="error"></div></div></section>
+<section id="done" class="hidden"><div class="panel result"><div class="qmeta">ПРОВЕРКА ЗАВЕРШЕНА</div><h2>Ответы сохранены</h2><div class="score" id="finalScore">—</div><p id="scoreText"></p><p class="small">Оценка рассчитана только по ответам «Да» и «Нет». Свои варианты сохранены отдельно и не меняют процент автоматически.</p><button class="btn" id="again">На главную</button></div></section>
+<section id="admin" class="hidden"><div class="panel"><h2>Панель администратора</h2>
+<div id="adminLogin"><p class="notice">Введи секретный код. Он не отображается на сайте и не хранится в браузере.</p><input id="adminCode" class="field" type="password" placeholder="Секретный код" autocomplete="off"><div class="btnrow"><button class="btn" id="login">Войти</button><button class="btn secondary" id="adminBack">Назад</button></div></div>
+<div id="adminResults" class="hidden"><div class="btnrow"><button class="btn secondary" id="refresh">Обновить список</button><button class="btn secondary" id="logout">Выйти</button></div><div id="resultsList"></div></div><div id="adminError" class="error"></div></div></section>
+<div class="footer">TRUST CHECK 2.0 · Береги личные данные и уважай границы других людей.</div></main>
+<script>
+const questions=[
+"Человек выполняет обещания, а если не может — заранее предупреждает?",
+"Он признаёт свою ошибку, даже если ему это невыгодно?",
+"Он уважает твой отказ и не пытается заставить тебя передумать?",
+"Он не рассказывает другим то, что ты доверил ему лично?",
+"Его слова обычно совпадают с его поступками?",
+"Он возвращает одолженные вещи и деньги в оговорённый срок?",
+"Он может спокойно обсудить проблему, не переходя на оскорбления?",
+"Он не использует твои слабые места против тебя во время ссоры?",
+"Он не требует от тебя пароли, личные переписки или постоянный доступ к телефону?",
+"Он спрашивает разрешение, прежде чем делиться твоими фото или сообщениями?",
+"Он способен сказать правду, даже если понимает, что ты можешь расстроиться?",
+"Он не исчезает специально, чтобы наказать тебя молчанием?",
+"Он уважает твоё время и предупреждает, если опаздывает?",
+"Он не высмеивает тебя перед другими ради собственной популярности?",
+"Он умеет хранить чужие секреты, а не только просит хранить его?",
+"Он не заставляет тебя выбирать между ним и другими близкими людьми?",
+"Он спокойно относится к тому, что у тебя есть собственное мнение?",
+"Он извиняется не только словами, но и старается исправить ситуацию?",
+"Он не присваивает себе твои идеи или заслуги?",
+"Он не распространяет слухи о людях без уверенности в фактах?",
+"Он не давит на тебя, когда ты просишь время подумать?",
+"Он ведёт себя уважительно и наедине, и при других людях?",
+"Он сообщает важную информацию прямо, а не скрывает её ради выгоды?",
+"После разногласий он старается найти честное решение, а не отомстить?"
+];
+const categories=["Честность","Уважение границ","Ответственность","Надёжность"];
+const state={index:0,answers:Array(24).fill(null),nickname:""};
+const $=id=>document.getElementById(id);
+function show(id){["home","quiz","done","admin"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function renderQuestion(){
+ const i=state.index,a=state.answers[i];$("qmeta").textContent=categories[Math.floor(i/6)]+" · ВОПРОС "+(i+1)+" ИЗ 24";$("bar").style.width=((i+1)/24*100)+"%";$("question").textContent=questions[i];
+ document.querySelectorAll(".choice").forEach(b=>b.classList.toggle("selected",Boolean(a&&a.choice===b.dataset.choice)));
+ $("customBox").classList.toggle("hidden",!(a&&a.choice==="custom"));$("customText").value=a&&a.choice==="custom"?a.note:"";$("back").disabled=i===0;$("next").textContent=i===23?"Завершить":"Далее";$("next").disabled=!a||(a.choice==="custom"&&!a.note.trim());$("quizError").textContent="";
+}
+document.querySelectorAll(".choice").forEach(b=>b.addEventListener("click",()=>{const choice=b.dataset.choice;state.answers[state.index]={choice,note:choice==="custom"?(state.answers[state.index]?.note||""):""};renderQuestion();if(choice!=="custom")$("next").disabled=false;}));
+$("customText").addEventListener("input",()=>{state.answers[state.index]={choice:"custom",note:$("customText").value};$("next").disabled=!$("customText").value.trim();});
+$("start").onclick=()=>{state.nickname=$("nickname").value.trim();state.index=0;state.answers=Array(24).fill(null);show("quiz");renderQuestion();};
+$("back").onclick=()=>{if(state.index>0){state.index--;renderQuestion();}};
+$("next").onclick=async()=>{
+ const a=state.answers[state.index];if(!a||(a.choice==="custom"&&!a.note.trim()))return;
+ if(state.index<23){state.index++;renderQuestion();return;}
+ $("next").disabled=true;$("quizError").textContent="Сохраняю ответы...";
+ try{const r=await fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nickname:state.nickname,answers:state.answers})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Ошибка сохранения.");$("finalScore").textContent=d.score===null?"—":d.score+"/100";$("scoreText").textContent=d.scoredAnswers+" ответов учтено; "+d.customAnswers+" своих вариантов сохранено отдельно.\n"+(d.categoryScores||[]).map(c=>c.name+": "+(c.score===null?"недостаточно ответов":c.score+"/100")).join(" · ");show("done");}
+ catch(e){$("quizError").textContent=e.message;$("next").disabled=false;}
+};
+$("again").onclick=()=>show("home");$("adminOpen").onclick=()=>{show("admin");$("adminError").textContent="";};$("adminBack").onclick=()=>show("home");
+$("login").onclick=async()=>{ $("adminError").textContent="";try{const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:$("adminCode").value})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Не удалось войти.");$("adminLogin").classList.add("hidden");$("adminResults").classList.remove("hidden");await loadResults();}catch(e){$("adminError").textContent=e.message;}};
+async function loadResults(){
+ $("adminError").textContent="Загружаю...";
+ try{const r=await fetch("/api/admin/results");const d=await r.json();if(!r.ok)throw new Error(d.error||"Ошибка загрузки.");$("adminError").textContent="";
+ if(!d.results.length){$("resultsList").innerHTML="<p class='notice'>Пока нет завершённых проверок.</p>";return;}
+ $("resultsList").innerHTML=d.results.map(x=>{const date=new Date(x.created_at).toLocaleString("ru-RU");const answers=(x.answers||[]).map(a=>"<div class='answerline'><b>"+a.question+". "+questions[a.question-1]+"</b><br>"+(a.choice==="yes"?"Да":a.choice==="no"?"Нет":"Свой вариант")+(a.note?" — "+escapeHtml(a.note):"")+"</div>").join("");return "<details class='admin-item'><summary>"+escapeHtml(x.nickname||"Без псевдонима")+" · "+(x.score===null?"без оценки":x.score+"/100")+" · "+date+"</summary><p class='small'>Учтено: "+x.scored_answers+" · Свои варианты: "+x.custom_answers+"</p><p class='small'>"+(x.category_scores||[]).map(c=>c.name+": "+(c.score===null?"—":c.score+"/100")).join(" · ")+"</p>"+answers+"</details>";}).join("");
+ }catch(e){$("adminError").textContent=e.message;}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("refresh").onclick=loadResults;$("logout").onclick=async()=>{await fetch("/api/admin/logout",{method:"POST"});$("adminLogin").classList.remove("hidden");$("adminResults").classList.add("hidden");$("adminCode").value="";};
+</script></body></html>
